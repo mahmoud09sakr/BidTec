@@ -1,0 +1,31 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "index.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "routes/auth.routes.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "routes/product.routes.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/auth/(.*)",
+      "dest": "/routes/auth.routes.js"
+    },
+    {
+      "src": "/products/(.*)",
+      "dest": "/routes/product.routes.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.js"
+    }
+  ]
+}
