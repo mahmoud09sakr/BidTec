@@ -6,3 +6,4 @@
 /notes.txt
 /untitled.vpp.bak_000f
 .vercel
+.env*.local

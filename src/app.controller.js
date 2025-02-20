@@ -13,6 +13,12 @@ export const bootstrap = (express, app) => {
     app.use('/categories', categoryRoutes)
     app.use('/subcategories', subCategoriesRouter)
     setupSwagger(app)
+    app.use((req, res, next) => {
+        req.setTimeout(8000, () => {
+            res.status(504).json({ error: "Request timed out" });
+        });
+        next();
+    });
     app.use(globalErrorHandling)
     app.use('*', (req, res, next) => {
         throw new AppError('Invalid Path', 404)
