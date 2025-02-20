@@ -2,25 +2,21 @@
   "version": 2,
   "builds": [
     {
+      "src": "package.json",
+      "use": "@vercel/static-build"
+    },
+    {
       "src": "index.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "routes/auth.routes.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "routes/product.routes.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/auth/(.*)",
+      "src": "/api/auth/(.*)",
       "dest": "/routes/auth.routes.js"
     },
     {
-      "src": "/products/(.*)",
+      "src": "/api/products/(.*)",
       "dest": "/routes/product.routes.js"
     },
     {
