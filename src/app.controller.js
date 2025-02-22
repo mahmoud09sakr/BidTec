@@ -10,18 +10,13 @@ export const bootstrap = async (express, app) => {
     console.log("Bootstrapping app...");
     app.use(express.json());
     DbConnection();
-    console.log("Database connected");
 
     app.get("/", (req, res) => {
-        console.log("Root route hit");
         res.send("Server is running...");
     });
     app.use('/auth', authRouter);
-    console.log("Auth routes mounted");
     app.use('/categories', categoryRoutes);
-    console.log("Category routes mounted");
     app.use('/subcategories', subCategoriesRouter);
-    console.log("Subcategory routes mounted");
     setupSwagger(app)
     app.use((req, res, next) => {
         req.setTimeout(8000, () => {
