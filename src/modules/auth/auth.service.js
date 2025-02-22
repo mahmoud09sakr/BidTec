@@ -8,11 +8,11 @@ import { handleAsyncError } from '../../errorHandling/handelAsyncError.js'
 export const signUp = handleAsyncError(async (req, res, next) => {
     let { name, email, confirmPassword, password, phone, adress, role, gender, age, location } = req.body;
     if (password !== confirmPassword) {
-        throw AppError("Passwords do not match", 400);
+        throw new AppError("Passwords do not match", 400);
     }
     let exsistUser = await userModel.findOne({ email });
     if (exsistUser) {
-        throw AppError("User already exists", 400);
+        throw new AppError("User already exists", 400);
     }
     let hashedPassword = await bcrypt.hash(password, 10);
     let user = await userModel.create({ name, email, password: hashedPassword, phone, adress, role, gender, age, location });
