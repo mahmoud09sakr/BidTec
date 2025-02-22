@@ -140,7 +140,7 @@ router.patch('/restore-subcategory/:subCategoryId', auth, checkRole('Admin'), va
  *       200:
  *         description: Subcategory updated successfully
  */
-router.patch('/update-subcategory/:subCategoryId', auth, checkRole('Admin'), upload.single('image'), uploadToCloudinary(), validation(updateSubCategorySchema), updateSubCategory);
+router.patch('/update-subcategory/:subCategoryId', auth, checkRole('Admin'), upload.single('image'), uploadToCloudinary(false), validation(updateSubCategorySchema), updateSubCategory);
 
 /**
  * @swagger
