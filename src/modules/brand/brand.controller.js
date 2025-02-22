@@ -6,7 +6,8 @@ import { upload, uploadToCloudinary } from '../../utilts/multer.js';
 import { checkRole } from '../../midlleware/role.js';
 import { auth } from '../../midlleware/auth.js';
 const router = Router();
-router.post('/create-brand', auth, checkRole('Admin', 'Agent'), upload.single('image'), uploadToCloudinary(true), validation(createBrandSchema), createBrand);
+
+router.post('/create-brand', auth, checkRole('Admin', 'Agent'), upload.single('logo'), uploadToCloudinary(true), validation(createBrandSchema), createBrand);
 router.get('/get-all-brands', auth, getAllBrands);
 router.get('/get-brand-by-id/:brandId', auth, validation(getBrandByIdSchema), getBrandById);
 router.get('/get-all-admin-brands', auth, checkRole('Admin'), getAllAdminBrands);

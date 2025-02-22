@@ -15,6 +15,8 @@ export const createBrand = handleAsyncError(async (req, res) => {
         throw new AppError('Image is required', 400);
     }
     const image = req.file.cloudinaryResult.url;
+    console.log(image);
+    
     const addedBrand = await brandModel.create({ name, logo: image });
     res.json({ message: 'Brand added successfully', addedBrand });
 });
