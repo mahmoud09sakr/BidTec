@@ -1,22 +1,29 @@
-import { Schema, Types, model } from "mongoose";
-import slugify from "slugify";
-const brandSchema = new Schema({
+import mongoose from 'mongoose';
+
+const brandSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
         unique: true,
         trim: true,
     },
-    slug: {
-        type: String,
-        lowercase: true
-    },
     logo: {
         type: String,
-        required: true
-    }
+        required: true,
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false,
+    },
+    deletedAt: {
+        type: Date,
+        default: null,
+    },
+    deletedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default: null,
+    },
 }, { timestamps: true });
-brandSchema.pre('save', function () {
-    this.slug = slugify(this.name)
-})
-export const brandModel = model('brand', brandSchema);
+const brandModel = mongoose.model('Brand', brandSchema);
+export default brandModel

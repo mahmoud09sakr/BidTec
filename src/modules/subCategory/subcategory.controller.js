@@ -11,7 +11,6 @@ const router = Router(
         strict: true
     }
 );
-
 /**
  * @swagger
  * components:
@@ -34,7 +33,6 @@ const router = Router(
  *           type: string
  *           description: ID of the parent category
  */
-
 /**
  * @swagger
  * /create-subcategory:
