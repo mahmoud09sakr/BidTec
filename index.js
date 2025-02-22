@@ -3,10 +3,14 @@ import { bootstrap } from './src/app.controller.js'
 import dotenv from "dotenv"
 dotenv.config()
 const app = express()
-const port = 3000
+const PORT = process.env.PORT || 4000; 
 
 bootstrap(express, app)
-
-app.listen(process.env.PORT || 3000, () => {
-    console.log(`Server running on port ${process.env.PORT || 3000}`);
+app.get("/", (req, res) => {
+    res.send("Server is running...");
 });
+
+
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
