@@ -32,6 +32,6 @@ export const auth = async (req, res, next) => {
         req.user = user
         next()
     } catch (error) {
-        return console.log(error);
+      throw new AppError('un autharized', 403)
     }
 }
