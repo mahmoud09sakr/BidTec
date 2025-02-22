@@ -21,7 +21,7 @@ const brandSchema = new mongoose.Schema({
     },
     deletedBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'user',
         default: null,
     },
 }, { timestamps: true });
