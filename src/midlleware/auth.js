@@ -25,13 +25,12 @@ export const auth = async (req, res, next) => {
         }
         let decoded = jwt.verify(token, signature)
         if (!decoded) {
-            res.json({ message: 'un autharized' })
             throw new AppError('un autharized', 403)
         }
         let user = await userModel.findById(decoded.id)
         req.user = user
         next()
     } catch (error) {
-      throw new AppError('un autharized', 403)
+        res.json({ message: 'un autharized' })
     }
 }
