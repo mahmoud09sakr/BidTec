@@ -9,6 +9,10 @@ import { AppError } from "./errorHandling/AppError.js";
 export const bootstrap = (express, app) => {
     app.use(express.json())
     DbConnection()
+
+    app.get("/", (req, res) => {
+        res.send("Server is running...");
+    });
     app.use('/auth', authRouter)
     app.use('/categories', categoryRoutes)
     app.use('/subcategories', subCategoriesRouter)
