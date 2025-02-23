@@ -29,6 +29,8 @@ export const uploadToCloudinary = (isRequired = true) => async (req, res, next) 
             }
             return next(); 
         }
+        console.log(req.file , req.files);
+        
         if (req.file) {
             const uploadPromise = new Promise((resolve, reject) => {
                 const stream = cloudinary.uploader.upload_stream(
