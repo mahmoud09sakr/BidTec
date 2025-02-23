@@ -1,7 +1,4 @@
 import { Schema, Types, model } from "mongoose";
-
-
-
 const reviewSchema = new Schema({
     text: {
         type: String,
@@ -23,9 +20,7 @@ const reviewSchema = new Schema({
         enum: [1, 2, 3, 4, 5]
     }
 }, { timestamps: true });
-
 reviewSchema.pre(/^find/, function () {
     this.populate('user', 'name')
 })
-
-export const reviewModel = model('review', reviewSchema);
+export const reviewModel = model('reviews', reviewSchema);

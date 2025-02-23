@@ -2,10 +2,10 @@ import { Router } from 'express';
 import categoriesModel from '../../database/model/category.model.js';
 import { uploadToCloudinary, upload } from '../../utilts/multer.js';
 import { validation } from '../../utilts/validation.js';
-import { createCategorySchema, deleteCategorySchema, getCategoryByIdSchema, restoreCategorySchema, updateCategorySchema } from './category.validation.js';
-import { createCategory, deleteCategory, getAllAdminCategories, getAllCategories, getAllDeletedCategories, getCategoryById, restoreCategory, updateCategory } from './category.service.js'
 import { checkRole } from '../../midlleware/role.js'
 import { auth } from '../../midlleware/auth.js';
+import { createCategorySchema, deleteCategorySchema, getCategoryByIdSchema, restoreCategorySchema, updateCategorySchema } from './category.validation.js';
+import { createCategory, deleteCategory, getAllAdminCategories, getAllCategories, getAllDeletedCategories, getCategoryById, restoreCategory, updateCategory } from './category.service.js'
 const router = Router(
     {
         mergeParams: true,

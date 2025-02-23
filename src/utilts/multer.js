@@ -8,41 +8,75 @@ cloudinary.config({
     api_key: process.env.CLOUDINARY_CLOUD_API_KYE,
     api_secret: process.env.CLOUDINARY_CLOUD_API_SECRET_KYE
 });
-
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
-
-export function fileFilter(req, file, cb) {
-    if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'image/jpg') {
-        cb(null, true);
-    } else {
-        cb(null, false);
-    }
-}
-
-// Middleware to upload to Cloudinary (conditionally required)
-export const uploadToCloudinary = (isRequired = true) => (req, res, next) => {
-
-    if (!req.file) {
-        if (isRequired) {
-            return next(new Error('File upload is required'));
+const upload = multer({
+    storage: storage,
+    fileFilter: (req, file, cb) => {
+        if (['image/jpeg', 'image/png', 'image/jpg'].includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(null, false);
         }
-        return next(); // Skip if file is optional
     }
+});
 
-    const stream = cloudinary.uploader.upload_stream(
-        { resource_type: 'auto' },
-        (error, result) => {
-            if (error) {
-                return next(error);
+export const uploadToCloudinary = (isRequired = true) => async (req, res, next) => {
+    try {
+        console.log('Files received:', req.file || req.files);
+        if (!req.file && !req.files) {
+            if (isRequired) {
+                return next(new AppError('File upload is required', 400));
             }
-
-            req.file.cloudinaryResult = result;
+            return next(); 
+        }
+        if (req.file) {
+            const uploadPromise = new Promise((resolve, reject) => {
+                const stream = cloudinary.uploader.upload_stream(
+                    { resource_type: 'auto' },
+                    (error, result) => {
+                        if (error) {
+                            reject(new AppError('Cloudinary upload failed', 500));
+                        } else {
+                            req.file.cloudinaryResult = result;
+                            resolve();
+                        }
+                    }
+                );
+                stream.end(req.file.buffer);
+            });
+            await uploadPromise;
+            return next();
+        }
+        if (req.files) {
+            const uploadPromises = [];
+            for (const fieldName in req.files) {
+                const files = req.files[fieldName];
+                files.forEach(file => {
+                    const promise = new Promise((resolve, reject) => {
+                        const stream = cloudinary.uploader.upload_stream(
+                            { resource_type: 'auto' },
+                            (error, result) => {
+                                if (error) reject(new AppError('Cloudinary upload failed', 500));
+                                resolve({ ...file, cloudinaryResult: result });
+                            }
+                        );
+                        stream.end(file.buffer);
+                    });
+                    uploadPromises.push(promise);
+                });
+            }
+            const uploadedFiles = await Promise.all(uploadPromises);
+            req.files = uploadedFiles.reduce((acc, file) => {
+                const fieldName = file.fieldname;
+                if (!acc[fieldName]) acc[fieldName] = [];
+                acc[fieldName].push(file);
+                return acc;
+            }, {});
             next();
         }
-    );
-
-    stream.end(req.file.buffer);
+    } catch (error) {
+        next(error);
+    }
 };
 
 export { upload };
