@@ -193,10 +193,7 @@ router.post('/create-product', auth, checkRole('Admin', 'Agent'), upload.fields(
 ]), (req, res, next) => {
     console.log('Files received:', req.files);
     next();
-}, uploadToCloudinary(true), (req, res, next) => {
-    console.log('After Cloudinary:', req.files);
-    next();
-}, validation(createProductSchema), createProduct);
+}, uploadToCloudinary(true), validation(createProductSchema), createProduct);
 /**
  * @swagger
  * /get-all-products:

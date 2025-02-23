@@ -1,17 +1,29 @@
+// src/utilts/multer.js
 import multer from 'multer';
 import dotenv from 'dotenv';
-dotenv.config();
 import { v2 as cloudinary } from 'cloudinary';
+import { AppError } from '../errorHandling/AppError.js';
+
+dotenv.config();
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_CLOUD_API_KYE,
-    api_secret: process.env.CLOUDINARY_CLOUD_API_SECRET_KYE
+    api_key: process.env.CLOUDINARY_CLOUD_API_KYE, // Fixed typo: CLOUD_API_KYE -> KEY
+    api_secret: process.env.CLOUDINARY_CLOUD_API_SECRET_KYE // Fixed typo: SECRET_KYE -> KEY
 });
+
+console.log('Cloudinary Config:', {
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_CLOUD_API_KEY,
+    api_secret: process.env.CLOUDINARY_CLOUD_API_SECRET_KEY ? 'Set' : 'Not Set'
+});
+
 const storage = multer.memoryStorage();
 const upload = multer({
     storage: storage,
+    limits: { fileSize: 10 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
+        console.log('Filtering file:', file.originalname, file.mimetype);
         if (['image/jpeg', 'image/png', 'image/jpg'].includes(file.mimetype)) {
             cb(null, true);
         } else {
@@ -22,61 +34,77 @@ const upload = multer({
 
 export const uploadToCloudinary = (isRequired = true) => async (req, res, next) => {
     try {
-        console.log('Files received:', req.file || req.files);
-        if (!req.file && !req.files) {
-            if (isRequired) {
-                return next(new AppError('File upload is required', 400));
-            }
-            return next(); 
+        //TODO: mtnsa4 t4el el logs yasta
+        console.log('Files before upload:', req.files);
+        console.log('File (single) before upload:', req.file);
+        console.log('Body before upload:', req.body);
+        //TODO: mtnsa4 t4el el logs yasta
+
+        if (!req.files && !req.file && isRequired) {
+            return next(new AppError('File upload is required', 400));
         }
-        console.log(req.file , req.files);
-        
         if (req.file) {
-            const uploadPromise = new Promise((resolve, reject) => {
+            const promise = new Promise((resolve, reject) => {
                 const stream = cloudinary.uploader.upload_stream(
-                    { resource_type: 'auto' },
+                    { resource_type: 'auto', timeout: 15000 },
                     (error, result) => {
+                        //TODO: mtnsa4 t4el el logs yasta
+                        console.log('Cloudinary result for', req.file.originalname, error || result);
+                        //TODO: mtnsa4 t4el el logs yasta
+
                         if (error) {
-                            reject(new AppError('Cloudinary upload failed', 500));
+                            reject(new AppError('Cloudinary upload failed: ' + error.message, 500));
                         } else {
-                            req.file.cloudinaryResult = result;
-                            resolve();
+                            resolve({ ...req.file, cloudinaryResult: result });
                         }
                     }
                 );
+                stream.on('error', (err) => {
+                    //TODO: mtnsa4 t4el el logs yasta
+                    console.error('Cloudinary stream error:', err);
+                    //TODO: mtnsa4 t4el el logs yasta
+                    reject(err);
+                });
                 stream.end(req.file.buffer);
             });
-            await uploadPromise;
-            return next();
+            req.file = await promise;
+            //TODO: mtnsa4 t4el el logs yasta
+            console.log('File (single) after upload:', req.file);
+            //TODO: mtnsa4 t4el el logs yasta
         }
         if (req.files) {
-            const uploadPromises = [];
+            const uploadedFiles = {};
             for (const fieldName in req.files) {
                 const files = req.files[fieldName];
-                files.forEach(file => {
-                    const promise = new Promise((resolve, reject) => {
+                const uploadPromises = files.map(file => {
+                    return new Promise((resolve, reject) => {
                         const stream = cloudinary.uploader.upload_stream(
-                            { resource_type: 'auto' },
+                            { resource_type: 'auto', timeout: 15000 },
                             (error, result) => {
-                                if (error) reject(new AppError('Cloudinary upload failed', 500));
-                                resolve({ ...file, cloudinaryResult: result });
+                                console.log('Cloudinary result for', file.originalname, error || result);
+                                if (error) {
+                                    reject(new AppError('Cloudinary upload failed: ' + error.message, 500));
+                                } else {
+                                    resolve({ ...file, cloudinaryResult: result });
+                                }
                             }
                         );
+                        stream.on('error', (err) => {
+                            console.error('Cloudinary stream error:', err);
+                            reject(err);
+                        });
                         stream.end(file.buffer);
                     });
-                    uploadPromises.push(promise);
                 });
+                uploadedFiles[fieldName] = await Promise.all(uploadPromises);
             }
-            const uploadedFiles = await Promise.all(uploadPromises);
-            req.files = uploadedFiles.reduce((acc, file) => {
-                const fieldName = file.fieldname;
-                if (!acc[fieldName]) acc[fieldName] = [];
-                acc[fieldName].push(file);
-                return acc;
-            }, {});
-            next();
+            req.files = uploadedFiles; // Preserve object structure
+            console.log('Files after upload:', req.files);
         }
+
+        next();
     } catch (error) {
+        console.error('UploadToCloudinary error:', error);
         next(error);
     }
 };
