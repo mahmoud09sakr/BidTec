@@ -8,8 +8,8 @@ dotenv.config();
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_CLOUD_API_KYE, // Fixed typo: CLOUD_API_KYE -> KEY
-    api_secret: process.env.CLOUDINARY_CLOUD_API_SECRET_KYE // Fixed typo: SECRET_KYE -> KEY
+    api_key: process.env.CLOUDINARY_CLOUD_API_KYE, 
+    api_secret: process.env.CLOUDINARY_CLOUD_API_SECRET_KYE 
 });
 
 console.log('Cloudinary Config:', {
