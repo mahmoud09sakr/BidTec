@@ -130,15 +130,19 @@ export const updateProfile = handleAsyncError(async (req, res) => {
 
 export const deletedUser = handleAsyncError(async (req, res, next) => {
     let { userId } = req.params;
-    let exsistUser = await userModel.findById(id);
+    let exsistUser = await userModel.findById(userId);
     if (!exsistUser) {
         throw new AppError("User not found", 400);
     }
     if (exsistUser.isDeleted == true) {
         throw new AppError("User is already deleted", 400);
     }
-    let deletedUser = await userModel.findByIdAndUpdate(id, { isDeleted: true , deletedBy: req.user._id , deletedAt: Date.now() }, { new: true });
+    exsistUser.isDeleted = true
+    exsistUser.deletedBy = req.user.id
+    exsistUser.deletedAt = Date.now()
+    let deletedUser = await exsistUser.save();
     res.json({ message: "User deleted successfully", deletedUser })
+
 })
 export const getAllUsers = handleAsyncError(async (req, res, next) => {
     let users = await userModel.find({}).populate('deletedBy', { name: 1, email: 1, phone: 1 });
