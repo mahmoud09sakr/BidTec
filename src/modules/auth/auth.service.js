@@ -16,7 +16,7 @@ export const signUp = handleAsyncError(async (req, res, next) => {
     }
     let hashedPassword = await bcrypt.hash(password, 10);
     let user = await userModel.create({ name, email, password: hashedPassword, phone, adress, role, gender, age, location });
-    let token = jwt.sign({ id: user._id }, process.env.VERIFY_SIGNATURE);
+    let token = jwt.sign({ id: user._id }, process.env.VERIFY_SIGNATURE , { expiresIn: '3m' });
     let confirmationLink = `http://${process.env.CLIENT_URL}/auth/confirm-email/${token}`;
     let html = `
 <!DOCTYPE html>
