@@ -26,7 +26,7 @@ export const bootstrap = async (express, app) => {
     setupSwagger(app);
     app.use(globalErrorHandling);
     app.use('*', (req, res, next) => {
-        throw new AppError('Invalid Path', 404);
+        throw new AppError('you tried to access a route that does not exist', 404);
     });
     app.listen(process.env.PORT, () => {
         console.log(`Server is running on port ${process.env.PORT}`);
