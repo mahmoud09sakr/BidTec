@@ -9,10 +9,8 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_CLOUD_API_SECRET_KYE
 });
 
-
 const storage = multer.memoryStorage();
 const upload = multer({
-
     storage: storage,
     fileFilter: (req, file, cb) => {
         if (['image/jpeg', 'image/png', 'image/jpg'].includes(file.mimetype)) {
@@ -24,71 +22,55 @@ const upload = multer({
     }
 });
 
+// Helper function to upload a single file
+const uploadSingleFile = (file) => {
+    return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+            { resource_type: 'auto' },
+            (error, result) => {
+                if (error) {
+                    console.error("Cloudinary Upload Error:", error);
+                    reject(error);
+                } else {
+                    resolve(result);
+                }
+            }
+        );
+        stream.end(file.buffer);
+    });
+};
+
 export const uploadToCloudinary = (isRequired = true) => async (req, res, next) => {
     try {
-        if (!req.file && !req.files) {
+        console.log("Received Files:", req.files);
+
+        if (!req.files || Object.keys(req.files).length === 0) {
             if (isRequired) {
                 return next(new Error('File upload is required'));
             }
             return next();
         }
-        console.log(req.file, "req.file");
-        console.log(req.files, "req.files");
 
 
-        if (req.file) {
-            console.log("Uploading file to Cloudinary...");
+        // Upload multiple images if exists
+        if (req.files.images) {
             try {
-                const result = await new Promise((resolve, reject) => {
-                    const stream = cloudinary.uploader.upload_stream(
-                        { resource_type: 'auto' },
-                        (error, result) => {
-                            if (error) {
-                                console.error("Cloudinary Upload Error:", error);
-                                reject(error);
-                            } else {
-                                resolve(result);
-                            }
-                        }
-                    );
-                    stream.end(req.file.buffer);
-                });
-
-                console.log("Upload Successful:", result.secure_url);
-                req.file.cloudinaryResult = result;
-                return next();
-            } catch (uploadError) {
-                console.error("Upload Failed:", uploadError);
-                return next(new Error("Cloudinary upload failed"));
-            }
-        }
-
-        if (req.files) {
-            console.log("Uploading multiple files...");
-            try {
-                for (const fieldName in req.files) {
-                    req.files[fieldName] = await Promise.all(
-                        req.files[fieldName].map(async (file) => {
-                            const result = await new Promise((resolve, reject) => {
-                                const stream = cloudinary.uploader.upload_stream(
-                                    { resource_type: 'auto' },
-                                    (error, result) => {
-                                        if (error) reject(error);
-                                        else resolve(result);
-                                    }
-                                );
-                                stream.end(file.buffer);
-                            });
-                            return { ...file, cloudinaryResult: result };
-                        })
-                    );
-                }
-                return next();
-            } catch (uploadError) {
-                console.error("Multiple Upload Failed:", uploadError);
+                console.log("Uploading multiple images...");
+                const uploadedImages = await Promise.all(
+                    req.files.images.map(async (file) => {
+                        const result = await uploadSingleFile(file);
+                        return { ...file, cloudinaryResult: result };
+                    })
+                );
+                req.files.images = uploadedImages;
+            } catch (error) {
+                console.error("Multiple Images Upload Failed:", error);
                 return next(new Error("Cloudinary multiple upload failed"));
             }
         }
+
+        console.log("All files uploaded successfully!");
+        next();
     } catch (error) {
         console.error("Unexpected Error:", error);
         return next(error);
