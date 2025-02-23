@@ -12,6 +12,7 @@ cloudinary.config({
 
 const storage = multer.memoryStorage();
 const upload = multer({
+
     storage: storage,
     fileFilter: (req, file, cb) => {
         if (['image/jpeg', 'image/png', 'image/jpg'].includes(file.mimetype)) {
@@ -31,6 +32,9 @@ export const uploadToCloudinary = (isRequired = true) => async (req, res, next) 
             }
             return next();
         }
+console.log(req.file, "req.file");
+console.log(req.files, "req.files");
+
 
         if (req.file) {
             console.log("Uploading file to Cloudinary...");

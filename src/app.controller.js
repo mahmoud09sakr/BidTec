@@ -26,7 +26,6 @@ export const bootstrap = async (express, app) => {
     setupSwagger(app);
     app.use(globalErrorHandling);
     app.use('*', (req, res, next) => {
-        res.status(404).json({ message: 'Route not found' });
         throw new AppError('you tried to access a route that does not exist', 404);
     });
     app.listen(process.env.PORT, () => {
