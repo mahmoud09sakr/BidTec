@@ -8,8 +8,8 @@ export const createProduct = handleAsyncError(async (req, res) => {
     const existingProduct = await productModel.findOne({ name });
     if (existingProduct) throw new AppError('Product already exists', 400);
     console.log(req.files, "req.filessssssssssssssssssssssssa");
-    console.log(req.files.imageCover, "req.filessssssssssssssssssssssssa");
-    if (!req.files || !req.files.imageCover || !req.files.images) {
+    console.log(req.files.images, "req.filessssssssssssssssssssssssa");
+    if (!req.files || !req.files.images) {
         throw new AppError('Image cover and at least one image are required', 400);
     }
     const imageCover = req.files.imageCover[0].cloudinaryResult.url;
