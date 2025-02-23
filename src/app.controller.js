@@ -7,6 +7,7 @@ import categoryRoutes from './modules/category/category.controller.js';
 import subCategoriesRouter from './modules/subCategory/subcategory.controller.js';
 import reviewsRouter from './modules/reviews/reviews.controller.js';
 import productRouter from './modules/product/product.controller.js'
+import userRouter from './modules/user/user.controller.js'
 import { AppError } from "./errorHandling/AppError.js";
 import { logPerformance } from './logPreformance.js'
 
@@ -23,6 +24,7 @@ export const bootstrap = async (express, app) => {
     app.use('/reviews', reviewsRouter);
     app.use('/brands', brandRouter);
     app.use('/products', productRouter);
+    app.use('/users', userRouter);
     setupSwagger(app);
     app.use(globalErrorHandling);
     app.use('*', (req, res, next) => {

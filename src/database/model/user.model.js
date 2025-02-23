@@ -3,7 +3,7 @@ const userSchema = new mongoose.Schema({
     name: String,
     email: {
         type: String,
-        required: true
+        required: false
     },
     password: {
         type: String,
@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
     },
     phone: {
         type: String,
-        required: true
+        required: false
     },
     address: String,
     image: String,
@@ -34,6 +34,19 @@ const userSchema = new mongoose.Schema({
     },
     otp: {
         type: Number
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
+    deletedAt: {
+        type: Date,
+        default: null
+    },
+    deletedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user',
+        default: null
     }
 }, { timestamps: true })
 const userModel = mongoose.model("user", userSchema)
