@@ -190,10 +190,7 @@ const router = Router({
 router.post('/create-product', auth, checkRole('Admin', 'Agent'), upload.fields([
     { name: 'imageCover', maxCount: 1 },
     { name: 'images', maxCount: 10 }
-]), (req, res, next) => {
-    console.log('Files received:', req.files);
-    next();
-}, uploadToCloudinary(true), validation(createProductSchema), createProduct);
+]), uploadToCloudinary(true), validation(createProductSchema), createProduct);
 /**
  * @swagger
  * /get-all-products:

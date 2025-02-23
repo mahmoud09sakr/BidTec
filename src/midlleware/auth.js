@@ -3,8 +3,6 @@ import userModel from '../database/model/user.model.js';
 import { AppError } from '../errorHandling/AppError.js';
 
 export const auth = async (req, res, next) => {
-    console.log("sakorrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
-    
     try {
         const { authorization } = req.headers;
         if (!authorization) {

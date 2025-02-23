@@ -30,10 +30,6 @@ const upload = multer({
         }
     }
 });
-
-// Debug multer version and request
-console.log('Multer version:', multer.version);
-
 const safeUpload = (uploadFn) => (req, res, next) => {
     console.log('Starting safeUpload with fields:', uploadFn.name);
     uploadFn(req, res, (err) => {
@@ -45,17 +41,14 @@ const safeUpload = (uploadFn) => (req, res, next) => {
         next();
     });
 };
-
 export const uploadToCloudinary = (isRequired = true) => async (req, res, next) => {
     try {
         console.log('Files before upload:', req.files);
         console.log('File (single) before upload:', req.file);
         console.log('Body before upload:', req.body);
-
         if (!req.files && !req.file && isRequired) {
             return next(new AppError('File upload is required', 400));
         }
-
         if (req.file) { // Single file upload
             const promise = new Promise((resolve, reject) => {
                 const stream = cloudinary.uploader.upload_stream(
@@ -78,8 +71,7 @@ export const uploadToCloudinary = (isRequired = true) => async (req, res, next) 
             req.file = await promise;
             console.log('File (single) after upload:', req.file);
         }
-
-        if (req.files) { // Multiple file uploads
+        if (req.files) {
             const uploadedFiles = {};
             for (const fieldName in req.files) {
                 const files = req.files[fieldName];
