@@ -12,6 +12,11 @@ export const createProduct = handleAsyncError(async (req, res) => {
     if (!req.files || !req.files.images) {
         throw new AppError('Image cover and at least one image are required', 400);
     }
+    if (!req.files.imageCover) {
+        throw new AppError('Image cover is required', 400);
+    } else {
+        imageCover = req.files.imageCover[0].cloudinaryResult.url
+    }
     const imageCover = req.files.imageCover[0].cloudinaryResult.url;
     const images = req.files.images.map(file => file.cloudinaryResult.url);
     const product = await productModel.create({
