@@ -188,10 +188,7 @@ const router = Router({
  *               $ref: '#/components/schemas/Error'
  */
 
-router.post('/add-product', auth, checkRole('Admin', 'Agent'), upload.fields([
-    { name: 'imageCover', maxCount: 1 },
-    { name: 'images', maxCount: 10 }
-]), uploadToCloudinary(true), validation(createProductSchema), createProduct);
+router.post('/add-product', auth, checkRole('Admin', 'Agent'), upload.array('images'), uploadToCloudinary(true), validation(createProductSchema), createProduct);
 
 /**
  * @swagger

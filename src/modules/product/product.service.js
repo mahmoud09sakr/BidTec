@@ -7,9 +7,7 @@ export const createProduct = handleAsyncError(async (req, res) => {
     const { name, price, priceAfterDiscount, description, stock, sold, category, subCategory, brand, tag, productType } = req.body;
     const existingProduct = await productModel.findOne({ name });
     if (existingProduct) throw new AppError('Product already exists', 400);
-    console.log(req.files, "req.filessssssssssssssssssssssssa");
-    console.log(req.files.images, "req.filessssssssssssssssssssssssa");
-    console.log( req.files.imageCover[0].cloudinaryResult.url, "imageCoverrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
+
     
     if (!req.files || !req.files.images) {
 
@@ -18,7 +16,7 @@ export const createProduct = handleAsyncError(async (req, res) => {
     if (!req.files.imageCover) {
         throw new AppError('Image cover is required', 400);
     } 
-    const imageCover = req.files.imageCover[0].cloudinaryResult.url;
+    const imageCover = req.files.images[0].cloudinaryResult.url;
     const images = req.files.images.map(file => file.cloudinaryResult.url);
     const product = await productModel.create({
         name, price, priceAfterDiscount, description, stock, sold,
