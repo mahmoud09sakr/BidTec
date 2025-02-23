@@ -168,10 +168,11 @@ export const restoreUser = handleAsyncError(async (req, res, next) => {
 export const upgradeRole = handleAsyncError(async (req, res, next) => {
     let { userId } = req.params;
     let { role } = req.body
-    let exsistUser = await userModel.findById(id);
+    let exsistUser = await userModel.findById(userId);
     if (!exsistUser) {
         throw new AppError("User not found", 400);
     }
-    let deletedUser = await userModel.findByIdAndUpdate(id, { role }, { new: true });
-    res.json({ message: "User upgraded successfully", deletedUser })
+    exsistUser.role = role
+    let upgradeRole = await exsistUser.save();
+    res.json({ message: "User upgraded successfully", upgradeRole })
 })
