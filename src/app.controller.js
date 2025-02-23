@@ -12,7 +12,8 @@ import { AppError } from "./errorHandling/AppError.js";
 import { logPerformance } from './logPreformance.js'
 
 export const bootstrap = async (express, app) => {
-    app.use(express.json());
+    app.use(express.json({ limit: '50mb' }));
+    app.use(express.urlencoded({ extended: true, limit: '50mb' }));
     app.use(logPerformance);
     DbConnection();
     app.get("/", (req, res) => {
