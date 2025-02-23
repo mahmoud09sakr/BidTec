@@ -137,7 +137,7 @@ export const deletedUser = handleAsyncError(async (req, res, next) => {
     if (exsistUser.isDeleted == true) {
         throw new AppError("User is already deleted", 400);
     }
-    let deletedUser = await userModel.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
+    let deletedUser = await userModel.findByIdAndUpdate(id, { isDeleted: true , deletedBy: req.user._id , deletedAt: Date.now() }, { new: true });
     res.json({ message: "User deleted successfully", deletedUser })
 })
 export const getAllUsers = handleAsyncError(async (req, res, next) => {
