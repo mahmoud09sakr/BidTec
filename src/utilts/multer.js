@@ -17,11 +17,10 @@ console.log('Cloudinary Config:', {
     api_key: process.env.CLOUDINARY_CLOUD_API_KYE,
     api_secret: process.env.CLOUDINARY_CLOUD_API_SECRET_KYE ? 'Set' : 'Not Set'
 });
-
 const storage = multer.memoryStorage();
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 10 * 1024 * 1024 },
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
     fileFilter: (req, file, cb) => {
         console.log('Filtering file:', file.originalname, file.mimetype);
         if (['image/jpeg', 'image/png', 'image/jpg'].includes(file.mimetype)) {
@@ -32,26 +31,37 @@ const upload = multer({
     }
 });
 
+// Debug multer version and request
+console.log('Multer version:', multer.version);
+
+const safeUpload = (uploadFn) => (req, res, next) => {
+    console.log('Starting safeUpload with fields:', uploadFn.name);
+    uploadFn(req, res, (err) => {
+        if (err) {
+            console.error('Multer error:', err);
+            return next(new AppError('Failed to parse form data: ' + err.message, 400));
+        }
+        console.log('Multer completed - Files:', req.files, 'File:', req.file);
+        next();
+    });
+};
+
 export const uploadToCloudinary = (isRequired = true) => async (req, res, next) => {
     try {
-        //TODO: mtnsa4 t4el el logs yasta
         console.log('Files before upload:', req.files);
         console.log('File (single) before upload:', req.file);
         console.log('Body before upload:', req.body);
-        //TODO: mtnsa4 t4el el logs yasta
 
         if (!req.files && !req.file && isRequired) {
             return next(new AppError('File upload is required', 400));
         }
-        if (req.file) {
+
+        if (req.file) { // Single file upload
             const promise = new Promise((resolve, reject) => {
                 const stream = cloudinary.uploader.upload_stream(
                     { resource_type: 'auto', timeout: 15000 },
                     (error, result) => {
-                        //TODO: mtnsa4 t4el el logs yasta
                         console.log('Cloudinary result for', req.file.originalname, error || result);
-                        //TODO: mtnsa4 t4el el logs yasta
-
                         if (error) {
                             reject(new AppError('Cloudinary upload failed: ' + error.message, 500));
                         } else {
@@ -60,19 +70,16 @@ export const uploadToCloudinary = (isRequired = true) => async (req, res, next) 
                     }
                 );
                 stream.on('error', (err) => {
-                    //TODO: mtnsa4 t4el el logs yasta
                     console.error('Cloudinary stream error:', err);
-                    //TODO: mtnsa4 t4el el logs yasta
                     reject(err);
                 });
                 stream.end(req.file.buffer);
             });
             req.file = await promise;
-            //TODO: mtnsa4 t4el el logs yasta
             console.log('File (single) after upload:', req.file);
-            //TODO: mtnsa4 t4el el logs yasta
         }
-        if (req.files) {
+
+        if (req.files) { // Multiple file uploads
             const uploadedFiles = {};
             for (const fieldName in req.files) {
                 const files = req.files[fieldName];
@@ -98,10 +105,9 @@ export const uploadToCloudinary = (isRequired = true) => async (req, res, next) 
                 });
                 uploadedFiles[fieldName] = await Promise.all(uploadPromises);
             }
-            req.files = uploadedFiles; // Preserve object structure
+            req.files = uploadedFiles;
             console.log('Files after upload:', req.files);
         }
-
         next();
     } catch (error) {
         console.error('UploadToCloudinary error:', error);
@@ -109,4 +115,6 @@ export const uploadToCloudinary = (isRequired = true) => async (req, res, next) 
     }
 };
 
+export const uploadSingle = safeUpload(upload.single.bind(upload));
+export const uploadFields = safeUpload(upload.fields.bind(upload));
 export { upload };
