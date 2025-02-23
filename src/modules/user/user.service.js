@@ -151,14 +151,17 @@ export const getAllUsers = handleAsyncError(async (req, res, next) => {
 
 export const restoreUser = handleAsyncError(async (req, res, next) => {
     let { userId } = req.params;
-    let exsistUser = await userModel.findById(id);
+    let exsistUser = await userModel.findById(userId);
     if (!exsistUser) {
         throw new AppError("User not found", 400);
     }
     if (exsistUser.isDeleted == false) {
         throw new AppError("User is not deleted", 400);
     }
-    let deletedUser = await userModel.findByIdAndUpdate(id, { isDeleted: false }, { new: true });
+    exsistUser.isDeleted = false
+    exsistUser.deletedBy = null
+    exsistUser.deletedAt = null
+    let deletedUser = await exsistUser.save();
     res.json({ message: "User restored successfully", deletedUser })
 })
 
