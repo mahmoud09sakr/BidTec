@@ -51,6 +51,17 @@ export const uploadToCloudinary = (isRequired = true) => async (req, res, next) 
             return next();
         }
 
+        // Upload single imageCover if exists
+        if (req.files.imageCover) {
+            try {
+                console.log("Uploading imageCover to Cloudinary...");
+                const result = await uploadSingleFile(req.files.imageCover[0]);
+                req.files.imageCover[0].cloudinaryResult = result;
+            } catch (error) {
+                console.error("imageCover Upload Failed:", error);
+                return next(new Error("Cloudinary imageCover upload failed"));
+            }
+        }
 
         // Upload multiple images if exists
         if (req.files.images) {
