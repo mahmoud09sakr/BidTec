@@ -8,14 +8,14 @@ dotenv.config();
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_CLOUD_API_KYE, 
-    api_secret: process.env.CLOUDINARY_CLOUD_API_SECRET_KYE 
+    api_key: process.env.CLOUDINARY_CLOUD_API_KYE,
+    api_secret: process.env.CLOUDINARY_CLOUD_API_SECRET_KYE
 });
 
 console.log('Cloudinary Config:', {
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_CLOUD_API_KEY,
-    api_secret: process.env.CLOUDINARY_CLOUD_API_SECRET_KEY ? 'Set' : 'Not Set'
+    api_key: process.env.CLOUDINARY_CLOUD_API_KYE,
+    api_secret: process.env.CLOUDINARY_CLOUD_API_SECRET_KYE ? 'Set' : 'Not Set'
 });
 
 const storage = multer.memoryStorage();
