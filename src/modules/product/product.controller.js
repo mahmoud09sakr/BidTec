@@ -187,12 +187,12 @@ const router = Router({
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-
+//TODO: 4a8ala local bss
 router.post('/add-product', auth, checkRole('Admin', 'Agent'), upload.fields([
     { name: 'imageCover', maxCount: 1 },
     { name: 'images', maxCount: 10 }
 ]), uploadToCloudinary(true), validation(createProductSchema), createProduct);
-
+//TODO: 4a8ala local bss
 /**
  * @swagger
  * /get-all-products:

@@ -26,7 +26,7 @@ export const updateProfile = handleAsyncError(async (req, res) => {
         if (email == exsistUser.email) {
             throw new AppError("Email already exists", 400);
         }
-        let token = jwt.sign({ id: exsistUser._id }, process.env.VERIFY_SIGNATURE , { expiresIn: '3m' });
+        let token = jwt.sign({ id: exsistUser._id }, process.env.VERIFY_SIGNATURE, { expiresIn: '3m' });
         let confirmationLink = `http://${process.env.CLIENT_URL}/auth/confirm-email/${token}`;
         let html = `
         <!DOCTYPE html>
