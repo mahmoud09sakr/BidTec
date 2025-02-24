@@ -14,7 +14,6 @@ const upload = multer({
     storage: storage,
     fileFilter: (req, file, cb) => {
         if (['image/jpeg', 'image/png', 'image/jpg'].includes(file.mimetype)) {
-            console.log('File received:', file.originalname);
             cb(null, true);
         } else {
             cb(new Error("Invalid file type"), false);
