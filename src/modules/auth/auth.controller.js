@@ -219,10 +219,11 @@ const router = Router(
 
 
 
-router.post('/signUp', validation(signUpSchema), signUp)
-router.post('/login', validation(loginSchema), login)
-router.post("/sendOTP", sendOTP)
-router.get('/confirm-email/:token', confirmEmail)
-router.patch("/resetPassword", resetPassword)
+router.post('/signUp', validation({ body: signUpSchema }), signUp);
+router.post('/login', validation({ body: loginSchema }), login);
+router.post("/sendOTP", sendOTP);
+router.get('/confirm-email/:token', confirmEmail);
+router.patch("/resetPassword", resetPassword);
+
 
 export default router

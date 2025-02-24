@@ -1,34 +1,41 @@
 import Joi from 'joi';
+import detectInjection from '../../utilts/detectInhection.js';
 
 export const createProductSchema = Joi.object({
-    body: Joi.object({
-        name: Joi.string().required().min(2),
-        price: Joi.number().required().min(0),
-        priceAfterDiscount: Joi.number().min(0).default(0),
-        description: Joi.string().required().min(10).max(100),
-        stock: Joi.number().required().min(0),
-        sold: Joi.number().min(0).default(0),
-        category: Joi.string().hex().length(24).required(),
-        subCategory: Joi.string().hex().length(24).required(),
-        brand: Joi.string().hex().length(24).required(),
-        tag: Joi.string().optional(), // JSON string, parsed in createProduct
-        productType: Joi.string().valid('tire', 'battary').default('tire')
-    }),
-    files: Joi.object({
-        imageCover: Joi.array().items(Joi.object().required()).min(1).max(1).required(),
-        images: Joi.array().items(Joi.object().required()).min(1).max(10).required()
-    }).required()
-});
+
+    name: Joi.string().min(2).required().custom(detectInjection)
+        .messages({ "string.injection": "Invalid characters detected in name" }),
+    price: Joi.number().min(0).required(),
+    priceAfterDiscount: Joi.number().min(0).default(0),
+    description: Joi.string().min(10).max(100).required().custom(detectInjection)
+        .messages({ "string.injection": "Invalid characters detected in description" }),
+    stock: Joi.number().min(0).required(),
+    sold: Joi.number().min(0).default(0),
+    category: Joi.string().hex().length(24).required(),
+    subCategory: Joi.string().hex().length(24).required(),
+    brand: Joi.string().hex().length(24).required(),
+    tag: Joi.string().optional().custom(detectInjection)
+        .messages({ "string.injection": "Invalid characters detected in tag" }),
+    productType: Joi.string().valid('tire', 'battary').default('tire')
+})
+
+export const fileSchema = Joi.object({
+    imageCover: Joi.array().items(Joi.object().required()).min(1).max(1).required(),
+    images: Joi.array().items(Joi.object().required()).min(1).max(10).required()
+}).required()
+
 export const getProductByIdSchema = Joi.object({
     productId: Joi.string().hex().length(24).required()
 });
 
 export const updateProductSchema = Joi.object({
     productId: Joi.string().hex().length(24).required(),
-    name: Joi.string().min(2).max(100).trim().optional(),
+    name: Joi.string().min(2).max(100).trim().optional().custom(detectInjection)
+        .messages({ "string.injection": "Invalid characters detected in name" }),
     price: Joi.number().min(0).optional(),
     priceAfterDiscount: Joi.number().min(0).less(Joi.ref('price')).optional(),
-    description: Joi.string().min(10).max(100).trim().optional(),
+    description: Joi.string().min(10).max(100).trim().optional().custom(detectInjection)
+        .messages({ "string.injection": "Invalid characters detected in description" }),
     stock: Joi.number().min(0).integer().optional(),
     sold: Joi.number().min(0).integer().optional(),
     imageCover: Joi.string().optional(),
@@ -50,4 +57,4 @@ export const restoreProductSchema = Joi.object({
 
 export const addTagSchema = Joi.object({
     tagId: Joi.string().hex().length(24).required()
-})
+});

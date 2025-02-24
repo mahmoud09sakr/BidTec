@@ -40,50 +40,54 @@ const uploadSingleFile = (file) => {
     });
 };
 
-export const uploadToCloudinary = (isRequired = true) => async (req, res, next) => {
+export const uploadToCloudinary = (isRequired = true, type = "array") => async (req, res, next) => {
     try {
-        console.log("Received Files:", req.files);
-
-        if (!req.files || Object.keys(req.files).length === 0) {
-            if (isRequired) {
-                return next(new Error('File upload is required'));
+        if (type === "array") {
+            if (!req.files) {
+                if (isRequired) {
+                    return next(new Error('File upload is required'));
+                }
+                return next();
             }
-            return next();
-        }
+            if (req.files.imageCover) {
+                try {
+                    const result = await uploadSingleFile(req.files.imageCover[0]);
+                    req.files.imageCover[0].cloudinaryResult = result;
+                } catch (error) {
+                    return next(new Error("Cloudinary imageCover upload failed"));
+                }
+            }
 
-        // Upload single imageCover if exists
-        if (req.files.imageCover) {
+            if (req.files.images) {
+                try {
+                    const uploadedImages = await Promise.all(
+                        req.files.images.map(async (file) => {
+                            const result = await uploadSingleFile(file);
+                            return { ...file, cloudinaryResult: result };
+                        })
+                    );
+                    req.files.images = uploadedImages;
+                } catch (error) {
+                    return next(new Error("Cloudinary multiple upload failed"));
+                }
+            }
+        } else if (type === "single") {
+            if (!req.file) {
+                if (isRequired) {
+                    return next(new Error('File upload is required'));
+                }
+                return next();
+            }
             try {
-                console.log("Uploading imageCover to Cloudinary...");
-                const result = await uploadSingleFile(req.files.imageCover[0]);
-                req.files.imageCover[0].cloudinaryResult = result;
+                const result = await uploadSingleFile(req.file);
+                req.file.cloudinaryResult = result;
             } catch (error) {
-                console.error("imageCover Upload Failed:", error);
-                return next(new Error("Cloudinary imageCover upload failed"));
+                return next(new Error("Cloudinary single image upload failed"));
             }
         }
 
-        // Upload multiple images if exists
-        if (req.files.images) {
-            try {
-                console.log("Uploading multiple images...");
-                const uploadedImages = await Promise.all(
-                    req.files.images.map(async (file) => {
-                        const result = await uploadSingleFile(file);
-                        return { ...file, cloudinaryResult: result };
-                    })
-                );
-                req.files.images = uploadedImages;
-            } catch (error) {
-                console.error("Multiple Images Upload Failed:", error);
-                return next(new Error("Cloudinary multiple upload failed"));
-            }
-        }
-
-        console.log("All files uploaded successfully!");
         next();
     } catch (error) {
-        console.error("Unexpected Error:", error);
         return next(error);
     }
 };

@@ -3,7 +3,7 @@ import { uploadToCloudinary, upload } from '../../utilts/multer.js';
 import { validation } from '../../utilts/validation.js';
 import { checkRole } from '../../midlleware/role.js';
 import { auth } from '../../midlleware/auth.js';
-import { addTagSchema, createProductSchema, deleteProductSchema, getProductByIdSchema, restoreProductSchema, updateProductSchema } from './product.validation.js';
+import { addTagSchema, createProductSchema, deleteProductSchema, fileSchema, getProductByIdSchema, restoreProductSchema, updateProductSchema } from './product.validation.js';
 import { createProduct, getAllProducts, getProductById, getAllAdminProducts, getAllDeletedProducts, updateProduct, deleteProduct, restoreProduct, addedTag } from './product.service.js';
 
 const router = Router({
@@ -191,7 +191,7 @@ const router = Router({
 router.post('/add-product', auth, checkRole('Admin', 'Agent'), upload.fields([
     { name: 'imageCover', maxCount: 1 },
     { name: 'images', maxCount: 10 }
-]), uploadToCloudinary(true), validation(createProductSchema), createProduct);
+]), uploadToCloudinary(true), validation({ body: createProductSchema, files: fileSchema }), createProduct);
 //TODO: 4a8ala local bss
 /**
  * @swagger
@@ -495,7 +495,7 @@ router.patch('/update-product/:productId', auth, checkRole('Admin'),
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.delete('/delete-product/:productId', auth, checkRole('Admin'), validation(deleteProductSchema), deleteProduct);
+router.delete('/delete-product/:productId', auth, checkRole('Admin'), validation({ params: deleteProductSchema }), deleteProduct);
 
 /**
  * @swagger
@@ -612,6 +612,6 @@ router.patch('/restore-product/:productId', auth, checkRole('Admin'), validation
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.patch('/add-remove-tag/:productId/:tagId?', auth, checkRole("Admin"), validation(addTagSchema), addedTag);
+router.patch('/add-remove-tag/:productId/:tagId?', auth, checkRole("Admin"), validation({ params: addTagSchema }), addedTag);
 
 export default router;

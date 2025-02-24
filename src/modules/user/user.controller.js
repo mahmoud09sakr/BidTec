@@ -151,7 +151,7 @@ router.get('/get-all-deleted-users', auth, checkRole('Admin'), getAllDeletedUser
  *       401:
  *         description: Unauthorized - Invalid or missing token
  */
-router.patch('/update-profile', auth, validation(updateProfileSchema), updateProfile);
+router.patch('/update-profile', auth, validation({ body: updateProfileSchema }), updateProfile);
 
 /**
  * @swagger

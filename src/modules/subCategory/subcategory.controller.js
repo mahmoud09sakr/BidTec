@@ -51,7 +51,7 @@ const router = Router(
  *       201:
  *         description: Subcategory created successfully
  */
-router.post('/create-subcategory', auth, checkRole('Admin', 'Agent'), upload.single('image'), uploadToCloudinary(), validation(createSubCategorySchema), createSubCategory);
+router.post('/create-subcategory', auth, checkRole('Admin', 'Agent'), upload.single('image'), uploadToCloudinary(true, "single"), validation({ body: createSubCategorySchema }), createSubCategory);
 
 /**
  * @swagger
@@ -138,7 +138,7 @@ router.patch('/restore-subcategory/:subCategoryId', auth, checkRole('Admin'), va
  *       200:
  *         description: Subcategory updated successfully
  */
-router.patch('/update-subcategory/:subCategoryId', auth, checkRole('Admin'), upload.single('image'), uploadToCloudinary(false), validation(updateSubCategorySchema), updateSubCategory);
+router.patch('/update-subcategory/:subCategoryId', auth, checkRole('Admin'), upload.single('image'), uploadToCloudinary(false), validation({ body: updateSubCategorySchema, params: restoreSubCategorySchema }), updateSubCategory);
 
 /**
  * @swagger

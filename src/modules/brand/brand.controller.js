@@ -112,7 +112,7 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/create-brand', auth, checkRole('Admin', 'Agent'), upload.single('logo'), uploadToCloudinary(true), validation(createBrandSchema), createBrand);
+router.post('/create-brand', auth, checkRole('Admin', 'Agent'), upload.single('logo'), uploadToCloudinary(true, "single"), validation({ body: createBrandSchema }), createBrand);
 
 /**
  * @swagger
@@ -189,7 +189,7 @@ router.get('/get-all-brands', auth, getAllBrands);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/get-brand-by-id/:brandId', auth, validation(getBrandByIdSchema), getBrandById);
+router.get('/get-brand-by-id/:brandId', auth, validation({ params: getBrandByIdSchema }), getBrandById);
 
 /**
  * @swagger
@@ -317,7 +317,7 @@ router.get('/get-all-deleted-brands', auth, checkRole('Admin'), getAllDeletedBra
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.patch('/restore-brand/:brandId', auth, checkRole('Admin'), validation(restoreBrandSchema), restoreBrand);
+router.patch('/restore-brand/:brandId', auth, checkRole('Admin'), validation({ params: restoreBrandSchema }), restoreBrand);
 
 /**
  * @swagger
@@ -380,7 +380,7 @@ router.patch('/restore-brand/:brandId', auth, checkRole('Admin'), validation(res
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.patch('/update-brand/:brandId', auth, checkRole('Admin'), upload.single('image'), uploadToCloudinary(false), validation(updateBrandSchema), updateBrand);
+router.patch('/update-brand/:brandId', auth, checkRole('Admin'), upload.single('image'), uploadToCloudinary(false), validation({ body: updateBrandSchema, params: getBrandByIdSchema }), updateBrand);
 
 /**
  * @swagger
@@ -431,6 +431,6 @@ router.patch('/update-brand/:brandId', auth, checkRole('Admin'), upload.single('
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.delete('/delete-brand/:brandId', auth, checkRole('Admin'), validation(deleteBrandSchema), deleteBrand);
+router.delete('/delete-brand/:brandId', auth, checkRole('Admin'), validation({ params: deleteBrandSchema }), deleteBrand);
 
 export default router;

@@ -177,12 +177,12 @@ const router = Router(
  *         description: Category not found
  */
 
-router.post('/create-category', auth, checkRole('Admin', 'Agent'), upload.single('image'), uploadToCloudinary(true), validation(createCategorySchema), createCategory);
+router.post('/create-category', auth, checkRole('Admin', 'Agent'), upload.single('image'), uploadToCloudinary(true, "single"), validation({ body: createCategorySchema }), createCategory);
 router.get('/get-all-categories', auth, getAllCategories);
-router.get('/get-category-by-id/:categoryId', auth, validation(getCategoryByIdSchema), getCategoryById);
+router.get('/get-category-by-id/:categoryId', auth, validation({ params: getCategoryByIdSchema }), getCategoryById);
 router.get('/get-all-admin-categories', auth, checkRole('Admin'), getAllAdminCategories);
 router.get('/get-all-deleted-categories', auth, checkRole('Admin'), getAllDeletedCategories);
-router.patch('/restore-category/:categoryId', auth, checkRole('Admin'), validation(restoreCategorySchema), restoreCategory);
+router.patch('/restore-category/:categoryId', auth, checkRole('Admin'), validation({ params: restoreCategorySchema }), restoreCategory);
 router.patch('/update-category/:categoryId', auth, checkRole('Admin'), upload.single('image'), validation(updateCategorySchema), uploadToCloudinary(false), validation(updateCategorySchema), updateCategory);
 router.delete('/delete-category/:categoryId', auth, checkRole('Admin'), validation(deleteCategorySchema), deleteCategory);
 
