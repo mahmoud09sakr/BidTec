@@ -22,7 +22,6 @@ export const commonSchema = {
 export const validation = (schema) => {
     
     return (req, res, next) => {
-        console.log(schema);
         const paramValidation = schema.params ? schema.params.validate(req.params, { abortEarly: false }) : { error: null };
         const queryValidation = schema.query ? schema.query.validate(req.query, { abortEarly: false }) : { error: null };
         const bodyValidation = schema.body ? schema.body.validate(req.body, { abortEarly: false }) : { error: null };
