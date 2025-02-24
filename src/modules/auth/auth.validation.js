@@ -39,7 +39,7 @@ export const signUpSchema = joi.object({
     email: joi.string().trim().lowercase().email().custom(detectInjection).required(),
     password: joi.string().trim().min(8).max(100).custom(detectInjection).required(),
     confirmPassword: joi.string().trim().valid(joi.ref("password")).required(),
-    phone: joi.string().trim().pattern(/^\+?[1-9]\d{9,14}$/).custom(detectInjection).required(),
+    phone: joi.string().trim().pattern(/^\+?[0-9]\d{9,14}$/).custom(detectInjection).required(),
     role: joi.string().trim().valid("Admin", "Agent", "Maintenance_Center", "User").default("User"),
     gender: joi.string().trim().valid("male", "female", "other").required(),
     age: joi.number().integer().min(18).max(100).required(),

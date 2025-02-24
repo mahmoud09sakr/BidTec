@@ -22,4 +22,5 @@ const cartSchema = new Schema({
     discount: Number
 }, { timestamps: true });
 
-export const cartModel = model('cart', cartSchema);
+const cartModel = model('cart', cartSchema);
+export default cartModel

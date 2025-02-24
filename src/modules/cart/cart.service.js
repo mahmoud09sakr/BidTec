@@ -1,6 +1,6 @@
 
 import mongoose from "mongoose";
-import { cartModel } from "../../database/model/cart.model.js";
+import cartModel  from "../../database/model/cart.model.js";
 import productModel from "../../database/model/product.model.js";
 import { AppError } from "../../errorHandling/AppError.js";
 import { handleAsyncError } from "../../errorHandling/handelAsyncError.js";

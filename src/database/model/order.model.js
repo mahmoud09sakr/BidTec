@@ -1,35 +1,29 @@
 import mongoose from "mongoose"
 
-
 const orderSchema = new mongoose.Schema({
-
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: "user",
         required: true
     },
     cartItems: [{
         productId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "product", 
-            required: true
         },
     }],
     shippingAddress: {
         type: String,
-        required: true
     },
     totalPrice: {
         type: Number,
-        required: true
     },
     paymentMethod: {
         type: String,
-        required: true,
         enum: ["cash", "visa"],
-        defaultL: "visa"
+        default: "cash"
     },
-    paidAt: {
+    orderdAt: {
         type: Date,
         default: Date.now
     },

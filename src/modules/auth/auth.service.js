@@ -16,7 +16,7 @@ export const signUp = handleAsyncError(async (req, res, next) => {
     }
     let hashedPassword = await bcrypt.hash(password, 10);
     let user = await userModel.create({ name, email, password: hashedPassword, phone, adress, role, gender, age, location });
-    let token = jwt.sign({ id: user._id }, process.env.VERIFY_SIGNATURE , { expiresIn: '3m' });
+    let token = jwt.sign({ id: user._id }, process.env.VERIFY_SIGNATURE, { expiresIn: '3m' });
     let confirmationLink = `http://${process.env.CLIENT_URL}/auth/confirm-email/${token}`;
     let html = `
 <!DOCTYPE html>
@@ -152,7 +152,7 @@ export const login = handleAsyncError(async (req, res, next) => {
     } else if (user.role === 'User') {
         signature = process.env.USER_SIGNATURE;
     }
-    let token = jwt.sign({ id: user._id }, signature);
+    let token = jwt.sign({ id: user._id, name: user.name }, signature);
     return res.status(200).json({ message: "Login successful", token });
 });
 
